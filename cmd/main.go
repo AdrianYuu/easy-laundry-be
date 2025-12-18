@@ -1,13 +1,24 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+	"github.com/AdrianYuu/easy-laundry-be/internal/config"
+)
 
 func main() {
-	app := fiber.New()
+	viper := config.NewViper()
+	app := config.NewFiber()
 
-	app.Get("/", func(ctx *fiber.Ctx) error {
-		return ctx.SendString("Hello, World!")
+	config.Bootstrap(&config.BootstrapConfig{
+		Config: viper,
+		App:    app,
 	})
 
-	app.Listen(":3000")
+	port := viper.GetInt("app.port")
+
+	err := app.Listen(fmt.Sprintf(":%d", port))
+
+	if err != nil {
+		panic(err)
+	}
 }
