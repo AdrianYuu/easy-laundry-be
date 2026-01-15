@@ -7,18 +7,22 @@ import (
 
 func main() {
 	viper := config.NewViper()
-	app := config.NewFiber()
+	fiber := config.NewFiber()
+	log := config.NewLogrus(viper)
+	database := config.NewGorm(viper, log)
 
 	config.Bootstrap(&config.BootstrapConfig{
-		Config: viper,
-		App:    app,
+		Viper: viper,
+		Fiber: fiber,
+		Log:   log,
+		Db:    database,
 	})
 
 	port := viper.GetInt("app.port")
 
-	err := app.Listen(fmt.Sprintf(":%d", port))
+	err := fiber.Listen(fmt.Sprintf(":%d", port))
 
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to start server: %v", err)
 	}
 }

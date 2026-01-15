@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"strings"
@@ -10,12 +11,12 @@ func NewViper() *viper.Viper {
 	err := godotenv.Load()
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to load env: %v", err))
 	}
 
-	config := viper.New()
-	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	config.AutomaticEnv()
+	v := viper.New()
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
 
-	return config
+	return v
 }
