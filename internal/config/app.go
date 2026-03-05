@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/AdrianYuu/easy-laundry-be/internal/delivery/http"
+	"github.com/AdrianYuu/easy-laundry-be/internal/delivery/http/middleware"
 	"github.com/AdrianYuu/easy-laundry-be/internal/delivery/http/route"
 	"github.com/AdrianYuu/easy-laundry-be/internal/repository"
 	"github.com/AdrianYuu/easy-laundry-be/internal/usecase"
@@ -22,12 +23,14 @@ type BootstrapConfig struct {
 
 func Bootstrap(config *BootstrapConfig) {
 	userRepository := repository.NewUserRepository(config.Log)
-	userUseCase := usecase.NewUserUseCase(config.Db, config.Log, config.Validate, userRepository)
+	userUseCase := usecase.NewUserUseCase(config.Db, config.Log, config.Validate, config.Viper, userRepository)
 	userController := http.NewUserController(config.Log, userUseCase)
+	authMiddleware := middleware.NewAuthMiddleware(userUseCase)
 
-	routeConfig := route.RouteConfig{
+	routeConfig := route.Config{
 		Fiber:          config.Fiber,
 		UserController: userController,
+		AuthMiddleware: authMiddleware,
 	}
 	routeConfig.Setup()
 }

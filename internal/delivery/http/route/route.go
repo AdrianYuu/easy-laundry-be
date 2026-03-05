@@ -5,11 +5,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type RouteConfig struct {
+type Config struct {
 	Fiber          *fiber.App
 	UserController *http.UserController
+	AuthMiddleware fiber.Handler
 }
 
-func (c *RouteConfig) Setup() {
+func (c *Config) Setup() {
 	c.Fiber.Get("/api/ping", c.UserController.Ping)
+
+	c.Fiber.Get("/api/protected", c.AuthMiddleware, c.UserController.Ping)
 }
